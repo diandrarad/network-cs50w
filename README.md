@@ -23,7 +23,8 @@ All Posts: The "All Posts" link in the navigation bar takes the user to a page w
 
 ## How to Use
 1. Clone or download the project repository.
-2. Set up a Python virtual environment and activate it.
-3. Install the required dependencies using pip install -r requirements.txt.
-4. Run the Django development server using python manage.py runserver.
-5. Access the website in your browser at http://localhost:8000.
+2. In your terminal, ```cd``` into the ```project4``` directory.
+3. Run ```python manage.py makemigrations network``` to make migrations for the network app.
+4. Run ```python manage.py migrate``` to apply migrations to your database.
+5. Run the Django development server using ```python manage.py runserver```.
+6. Access the website in your browser at http://localhost:8000.
