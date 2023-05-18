@@ -1,1 +1,6 @@
-
+.btn-light {
+    background-color: white;
+}
+.like-button:focus {
+    border: none;
+}
