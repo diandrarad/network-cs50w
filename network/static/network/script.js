@@ -226,14 +226,6 @@ function load_posts(postType = 'all', profileUsername = null, page = 1) {
             strong.textContent = post.username;
             strong.classList.add('profile-link');
             
-            strong.addEventListener('mouseenter', function() {
-                strong.style.textDecoration = 'underline';
-            });
-            
-            strong.addEventListener('mouseleave', function() {
-                strong.style.textDecoration = 'none';
-            });
-            
             strong.addEventListener('click', function() {
                 load_profile(post.username);
                 history.pushState({ section: 'profile', username: post.username }, '', `${post.username}`);
@@ -250,25 +242,105 @@ function load_posts(postType = 'all', profileUsername = null, page = 1) {
             cardText.classList.add('card-text');
             cardText.textContent = post.content;
 
+            const cardTextForEditedContent = document.createElement('p');
+            cardText.classList.add('card-text');
+
             cardBody.appendChild(cardTitle);
             cardBody.appendChild(cardText);
+            cardBody.appendChild(cardTextForEditedContent);
 
             if (data.is_authenticated) {
                 if (post.is_author) {
-                    const editLink = document.createElement('a');
-                    editLink.href = `/edit_post/${post.id}`;
-                    editLink.classList.add('icon-link', 'icon-link-hover', 'text-decoration-none');
-                    editLink.style = '--bs-icon-link-transform: translate3d(0, -.125rem, 0);';
-                    const editIcon = document.createElement('i');
-                    editIcon.classList.add('fas', 'fa-pen', 'bi');
-                    editIcon.setAttribute('aria-hidden', 'true');
-                    editLink.appendChild(editIcon);
+                    const editLink = document.createElement('p');
+                    editLink.classList.add('edit-link', 'text-primary');
                     editLink.textContent = ' Edit';
 
                     const floatEndSpan = document.createElement('span');
                     floatEndSpan.classList.add('float-end');
+            
+                    editLink.addEventListener('mouseenter', function() {
+                        editLink.style.textDecoration = 'underline';
+                    });
+                    
+                    editLink.addEventListener('mouseleave', function() {
+                        editLink.style.textDecoration = 'none';
+                    });
+
                     floatEndSpan.appendChild(editLink);
 
+                    editLink.addEventListener('click', () => {
+                        editLink.style.display = 'none';
+                        const editTextarea = document.createElement('textarea');
+                        editTextarea.classList.add('form-control', 'border-0');
+                        editTextarea.value = post.content;
+    
+                        // Set maximum character count (e.g., 280 characters)
+                        const maxCharacters = 280;
+    
+                        // Calculate the number of rows based on the length of the content
+                        editTextarea.maxLength = maxCharacters;
+                        editTextarea.rows = Math.ceil(post.content.length / 50);
+    
+                        const remainingChars = maxCharacters - post.content.length;
+                        const charCountElement = document.createElement('p');
+                        charCountElement.classList.add('me-5');
+                        charCountElement.textContent = `${remainingChars} characters remaining`;
+    
+                        editTextarea.addEventListener('input', () => {
+                            const remainingChars = maxCharacters - editTextarea.value.length;
+                            charCountElement.textContent = `${remainingChars} characters remaining`;
+                        });
+                        
+                        const cancelButton = document.createElement('button');
+                        cancelButton.classList.add('btn', 'btn-outline-secondary', 'ms-2', 'rounded-5','btn-sm');
+                        cancelButton.textContent = 'Cancel';
+                        cancelButton.addEventListener('click', () => {
+                            // Replace the textarea with the original post content
+                            cancelButton.remove();
+                            saveButton.remove();
+                            charCountElement.remove();
+                            editLink.style.display = 'block';
+                            editTextarea.replaceWith(cardText);
+                        });
+                        
+                        const saveButton = document.createElement('button');
+                        saveButton.classList.add('btn', 'btn-outline-success', 'ms-2', 'rounded-5','btn-sm');
+                        saveButton.textContent = 'Save';
+                        saveButton.addEventListener('click', () => {
+                            const newContent = editTextarea.value;
+                            // Send the updated content to the server and handle the response
+                            fetch(`/edit_post/${post.id}/`, {
+                                method: 'POST',
+                                body: new URLSearchParams({ content: newContent }),
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'X-CSRFToken': getCookie('csrftoken'),
+                                },
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                // Replace the textarea with the updated content
+                                if (data.success) {
+                                    cardText.textContent = newContent;
+                                    editTextarea.replaceWith(cardText);
+                                    cancelButton.remove();
+                                    saveButton.remove();
+                                    charCountElement.remove();
+                                    editLink.style.display = 'block';
+                                } else {
+                                    console.log('Failed to save post.');
+                                }
+                            })
+                            .catch(error => {
+                                console.log('An error occurred:', error);
+                            });
+                        });
+                        
+                        cardText.replaceWith(editTextarea);
+                        floatEndSpan.appendChild(charCountElement);
+                        floatEndSpan.appendChild(cancelButton);
+                        floatEndSpan.appendChild(saveButton);
+                    });
                     cardBody.appendChild(floatEndSpan);
                 }
 
