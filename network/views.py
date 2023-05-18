@@ -17,6 +17,11 @@ def index(request):
 def new_post(request):
     if request.method == 'POST':
         content = request.POST['content']
+        
+        # Validate the character limit
+        if len(content) > 280:
+            return JsonResponse({'success': False, 'message': 'Character limit exceeded.'})
+        
         post = Post.objects.create(user=request.user, content=content)
         return render(request, "network/index.html")
 
@@ -110,14 +115,24 @@ def follow_unfollow(request, user_id):
 
 
 def edit_post(request, post_id):
-    post = Post.objects.get(pk=post_id)
-    if request.user == post.user:
-        if request.method == 'POST':
-            post.content = request.POST['content']
-            post.save()
-            return render(request, "network/index.html")
-        return render(request, 'network/edit_post.html', {'post': post})
-    return render(request, "network/index.html")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # Check if the current user is the author of the post
+    if request.user != post.user:
+        return JsonResponse({'success': False, 'message': 'You are not authorized to edit this post.'})
+    
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        
+        # Validate the character limit
+        if len(content) > 280:
+            return JsonResponse({'success': False, 'message': 'Character limit exceeded.'})
+        
+        post.content = content
+        post.save()
+        return JsonResponse({'success': True, 'message': 'Post updated successfully.'})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request.'})
 
 
 
