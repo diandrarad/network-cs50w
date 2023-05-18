@@ -1,1 +1,34 @@
+{% extends "network/layout.html" %}
 
+{% block body %}
+    <h4 class="mt-5">Edit Post</h4>
+
+    <form method="POST" action="{% url 'edit_post' post.id %}">
+        {% csrf_token %}
+        <div class="position-relative">
+            <textarea id="edit-field" name="content" rows="6" placeholder="What is happening?" class="form-control border border-top-0 border-bottom-0 border-end-0 border-start-0">
+                {{ post.content }}
+            </textarea>
+            <div class="position-absolute bottom-0 end-0">
+                <button type="submit" id="edit-button" class="btn btn-primary rounded-5">
+                    <strong>Save</strong>
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Enable button only if there is text in the input field
+            document.querySelector('#edit-field').onkeyup = () => {
+                if (document.querySelector('#edit-field').value.trim().length > 0)
+                    document.querySelector('#edit-button').disabled = false;
+                else
+                    document.querySelector('#edit-button').disabled = true;
+            };
+        });
+    </script>
+{% endblock %}
