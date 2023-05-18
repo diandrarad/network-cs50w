@@ -1,1 +1,46 @@
+{% extends "network/layout.html" %}
+{% load static %}
 
+{% block body %}
+    
+    <div id="profile-view" class="mb-5">
+        <div id="profile-header">
+            <h4><strong id="username"></strong></h4>
+
+            <span class="float-end">
+                <button id="follow-button" class="btn btn-dark rounded-5">
+                </button>
+            </span>
+        </div>
+
+        <p class="fs-6 text-muted">
+            <span id="follow-count" class="me-4">
+                <strong id="followers-count"></strong> Followers
+            </span>
+            <span>
+                <strong id="following-count"></strong> Following
+            </span>
+        </p>
+    </div>
+
+    <div id="posts-view">
+
+        <div id="new-post-view" class="mb-5">
+
+            <form action="{% url 'new_post' %}" method="post">
+                {% csrf_token %}
+                <div class="position-relative">
+                    <textarea id="input-field" name="content" rows="4" maxlength="280" placeholder="What is happening?" class="form-control border border-top-0 border-end-0 border-start-0"></textarea>
+                    <div class="position-absolute bottom-0 end-0">
+                        <button type="submit" id="post-button" class="btn btn-primary rounded-5"><strong>Post</strong></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <h5 id="post-type"></h5>
+
+        <div id="posts-container">
+        </div>
+    </div>
+
+{% endblock %}
