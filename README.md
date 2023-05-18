@@ -1,6 +1,7 @@
 # Social Network Website
 
 ### [Video Demo](https://youtu.be/5oMvd2DKT-A)
+### [Updated edit post functionality Video Demo](https://youtu.be/LwywPK-3HME)
 
 ## Description
 This is a Single-Page JavaScript social network website project that allows users to make posts, follow other users, and "like" posts. It is implemented using Python, JavaScript, HTML, CSS, and Django framework.
