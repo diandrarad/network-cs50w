@@ -230,6 +230,14 @@ function load_posts(postType = 'all', profileUsername = null, page = 1) {
                 load_profile(post.username);
                 history.pushState({ section: 'profile', username: post.username }, '', `${post.username}`);
             });
+            
+            strong.addEventListener('mouseenter', function() {
+                strong.style.textDecoration = 'underline';
+            });
+            
+            strong.addEventListener('mouseleave', function() {
+                strong.style.textDecoration = 'none';
+            });
             const small = document.createElement('small');
             const timestampSpan = document.createElement('span');
             timestampSpan.classList.add('float-end', 'text-muted');
